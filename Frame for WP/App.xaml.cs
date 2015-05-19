@@ -7,7 +7,7 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Frame_for_WP.Resources;
-using Frame_for_WP.ViewModels;
+using Frame_for_WP.ViewModel;
 
 namespace Frame_for_WP
 {
