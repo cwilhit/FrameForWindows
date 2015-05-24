@@ -12,6 +12,7 @@
   See http://www.galasoft.ch/mvvm
 */
 
+using Frame_for_WP.ViewModels;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
@@ -43,6 +44,7 @@ namespace Frame_for_WP.ViewModel
             ////}
 
             SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register<MediaFeedViewModel>();
         }
 
         public MainViewModel Main
@@ -50,6 +52,14 @@ namespace Frame_for_WP.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<MainViewModel>();
+            }
+        }
+
+        public MediaFeedViewModel MediaFeedVM
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<MediaFeedViewModel>();
             }
         }
         
