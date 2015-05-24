@@ -1,4 +1,5 @@
-﻿using Frame_for_WP.Model;
+﻿using Frame_for_WP.Core;
+using Frame_for_WP.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Phone.Controls;
@@ -20,6 +21,12 @@ namespace Frame_for_WP.ViewModels
         private const string BaseUrl = "http://1-dot-august-clover-86805.appspot.com";
 
         public RelayCommand<PivotItemEventArgs> LoadPivotItemAppBar
+        {
+            get;
+            private set;
+        }
+
+        public RelayCommand OpenCameraCommand
         {
             get;
             private set;
@@ -48,15 +55,24 @@ namespace Frame_for_WP.ViewModels
         }
 
         private RestClient client;
+        private readonly NavigationService navigationService;
 
-        public MediaFeedViewModel()
+        public MediaFeedViewModel(INavigationService navigationService)
         {
+            this.navigationService = (NavigationService)navigationService;
+
             contentFeed = new ObservableCollection<MediaContent>();
             client = new RestClient(BaseUrl);
 
             mediaFeedAppBarSetup();
 
             LoadPivotItemAppBar = new RelayCommand<PivotItemEventArgs>((s) => SetUpAppBar(s));
+            OpenCameraCommand = new RelayCommand(() => onOpenCamera());
+        }
+
+        private void onOpenCamera()
+        {
+            navigationService.Navigate(new Uri("/Main/Lifting.xaml", UriKind.Relative));
         }
 
         private void mediaFeedAppBarSetup()

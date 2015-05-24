@@ -45,6 +45,7 @@ namespace Frame_for_WP.ViewModel
 
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<MediaFeedViewModel>();
+            SimpleIoc.Default.Register<MediaContentPostViewModel>();
         }
 
         public MainViewModel Main
@@ -60,6 +61,14 @@ namespace Frame_for_WP.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<MediaFeedViewModel>();
+            }
+        }
+
+        public MediaContentPostViewModel MediaContentPostVM
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<MediaContentPostViewModel>();
             }
         }
         

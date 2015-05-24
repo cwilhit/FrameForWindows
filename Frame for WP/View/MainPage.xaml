@@ -82,7 +82,7 @@
             <!--Pivot item two-->
             <phone:PivotItem Header="post">
                 <StackPanel>
-                    <Button Content="Picture" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                    <Button Content="Picture" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding OpenCameraCommand}"/>
                     <Button Content="Text" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 </StackPanel>
             </phone:PivotItem>
