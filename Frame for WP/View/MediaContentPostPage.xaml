@@ -6,6 +6,9 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Controls="clr-namespace:Coding4Fun.Toolkit.Controls;assembly=Coding4Fun.Toolkit.Controls"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -14,6 +17,11 @@
     mc:Ignorable="d"
     shell:SystemTray.IsVisible="True"
     ApplicationBar="{Binding AppBar}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="BackKeyPress">
+            <cmd:EventToCommand Command="{Binding BackKeyPressCommand}" PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
@@ -25,6 +33,7 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="0,0,0,0">
             <Canvas Background="{Binding PreviewVideoBrush}"/>
+            <Controls:RoundButton Visibility="{Binding ShutterVisibility}" Command="{Binding ShutterCommand}" Stretch="Fill" ImageSource="Assets/Appbar/appbar.camera.png" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,100" ButtonHeight="130" ButtonWidth="130" Foreground="{x:Null}"/>
         </Grid>
     </Grid>
 

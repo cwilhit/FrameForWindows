@@ -13,6 +13,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
+    Background="White"
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="True"
     ApplicationBar="{Binding AppBar}">
@@ -82,8 +83,8 @@
             <!--Pivot item two-->
             <phone:PivotItem Header="post">
                 <StackPanel>
-                    <Button Content="Picture" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding OpenCameraCommand}"/>
-                    <Button Content="Text" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                    <Button Content="Picture" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding OpenCameraCommand}" Height="138" Margin="96,0,127,0" Width="233"/>
+                    <Button Content="Text" HorizontalAlignment="Center" VerticalAlignment="Top" Height="171" Margin="111,0,127,0" Width="218"/>
                 </StackPanel>
             </phone:PivotItem>
         </phone:Pivot>

@@ -7,6 +7,8 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
+using Frame_for_WP.ViewModel;
+using Frame_for_WP.ViewModels;
 
 namespace Frame_for_WP.View
 {
@@ -15,6 +17,21 @@ namespace Frame_for_WP.View
         public MediaContentPostPage()
         {
             InitializeComponent();
+        }
+
+        MediaContentPostViewModel viewModel
+        {
+            get
+            {
+                return this.DataContext as MediaContentPostViewModel;
+            }
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            viewModel.openCamera();
         }
     }
 }

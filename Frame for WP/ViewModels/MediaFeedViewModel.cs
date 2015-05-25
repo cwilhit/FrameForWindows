@@ -1,7 +1,7 @@
-﻿using Frame_for_WP.Core;
-using Frame_for_WP.Model;
+﻿using Frame_for_WP.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Views;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using RestSharp;
@@ -72,7 +72,7 @@ namespace Frame_for_WP.ViewModels
 
         private void onOpenCamera()
         {
-            navigationService.Navigate(new Uri("/Main/Lifting.xaml", UriKind.Relative));
+            navigationService.NavigateTo("MediaContentPostPage");
         }
 
         private void mediaFeedAppBarSetup()

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
   <DefaultLanguage xmlns="" code="en-US" />
-  <App xmlns="" ProductID="{7f6f7687-356e-4ab7-9859-144d74491e88}" Title="Frame_for_WP" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Frame_for_WP author" Description="Sample description" Publisher="Frame_for_WP" PublisherID="{8a838a46-2998-4457-bbdf-9abbcb3d6649}">
+  <App xmlns="" ProductID="{7f6f7687-356e-4ab7-9859-144d74491e88}" Title="Frame" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Frame_for_WP author" Description="Sample description" Publisher="Frame_for_WP" PublisherID="{8a838a46-2998-4457-bbdf-9abbcb3d6649}">
     <IconPath IsRelative="true" IsResource="false">Assets\ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />

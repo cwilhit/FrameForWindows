@@ -15,7 +15,9 @@
 using Frame_for_WP.ViewModels;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
+using GalaSoft.MvvmLight.Views;
 using Microsoft.Practices.ServiceLocation;
+using System;
 
 namespace Frame_for_WP.ViewModel
 {
@@ -31,6 +33,8 @@ namespace Frame_for_WP.ViewModel
         public ViewModelLocator()
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+            var navService = this.CreateNavigationService();
+            SimpleIoc.Default.Register<INavigationService>(() => navService);
 
             ////if (ViewModelBase.IsInDesignModeStatic)
             ////{
@@ -46,6 +50,14 @@ namespace Frame_for_WP.ViewModel
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<MediaFeedViewModel>();
             SimpleIoc.Default.Register<MediaContentPostViewModel>();
+        }
+
+        private INavigationService CreateNavigationService()
+        {
+            var navService = new NavigationService();
+            navService.Configure("MediaContentPostPage", new Uri("/View/MediaContentPostPage.xaml", UriKind.Relative));
+
+            return navService;
         }
 
         public MainViewModel Main

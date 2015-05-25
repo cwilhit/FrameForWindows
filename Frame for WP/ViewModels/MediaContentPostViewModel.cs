@@ -14,16 +14,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Frame_for_WP.ViewModels
 {
     public class MediaContentPostViewModel : ViewModelBase
     {
-        private int photoCounter = 0;
+        private int flashMode = 0;
         PhotoCamera camera;
+        CameraType curType;
 
-        private VideoBrush _previewVideoBrush;
-        public VideoBrush PreviewVideoBrush
+        private Visibility shutterVisiblity;
+        public Visibility ShutterVisibility
+        {
+            get { return shutterVisiblity; }
+            set
+            {
+                shutterVisiblity = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private TileBrush _previewVideoBrush;
+        public TileBrush PreviewVideoBrush
         {
             get { return _previewVideoBrush; }
             set
@@ -35,6 +48,18 @@ namespace Frame_for_WP.ViewModels
         }
 
         public RelayCommand<PivotItemEventArgs> LoadPivotItemAppBar
+        {
+            get;
+            private set;
+        }
+
+        public RelayCommand ShutterCommand
+        {
+            get;
+            private set;
+        }
+
+        public RelayCommand<CancelEventArgs> BackKeyPressCommand
         {
             get;
             private set;
@@ -53,10 +78,47 @@ namespace Frame_for_WP.ViewModels
 
         public MediaContentPostViewModel()
         {
-            LoadPivotItemAppBar = new RelayCommand<PivotItemEventArgs>((s) => SetUpAppBar(s));
+            ShutterCommand = new RelayCommand(() => ShutterButtonClick());
+            BackKeyPressCommand = new RelayCommand<CancelEventArgs>((x) => InterceptBackKeyPress(x));
+
+            SetUpAppBar();
+            AppBar.Opacity = .65;
+            ShutterVisibility = Visibility.Visible;
         }
 
-        private void openCamera()
+        private void InterceptBackKeyPress(CancelEventArgs x)
+        {
+            if (ShutterVisibility == Visibility.Collapsed)
+            {
+                x.Cancel = true;
+                ShutterVisibility = Visibility.Visible;
+                SetUpAppBar();
+
+                openCamera();
+            }
+            else
+            {
+                releaseCamera();
+            }
+        }
+
+        private void ShutterButtonClick()
+        {
+
+            if(camera != null)
+            {
+                try
+                {
+                    camera.CaptureImage();
+                }
+                catch(Exception e)
+                {
+
+                }
+            }
+        }
+
+        public void openCamera()
         {
             if(PhotoCamera.IsCameraTypeSupported(CameraType.Primary) == true ||
                 PhotoCamera.IsCameraTypeSupported(CameraType.FrontFacing) == true)
@@ -65,9 +127,13 @@ namespace Frame_for_WP.ViewModels
                 if (PhotoCamera.IsCameraTypeSupported(CameraType.FrontFacing))
                 {
                     camera = new PhotoCamera(CameraType.FrontFacing);
+                    curType = CameraType.FrontFacing;
                 }
                 else
+                {
                     camera = new PhotoCamera(CameraType.Primary);
+                    curType = CameraType.Primary;
+                }
             }
             else
             {
@@ -85,10 +151,51 @@ namespace Frame_for_WP.ViewModels
 
             //Set the VideoBrush source to the camera.
             PreviewVideoBrush = new VideoBrush();
-            PreviewVideoBrush.SetSource(camera);
+            VideoBrush vidBrush = (VideoBrush)PreviewVideoBrush;
+
+            if(camera.CameraType == CameraType.FrontFacing)
+                vidBrush.RelativeTransform = new CompositeTransform() { CenterX = .5, CenterY = .5, Rotation = -90 };
+            else
+                vidBrush.RelativeTransform = new CompositeTransform() { CenterX = .5, CenterY = .5, Rotation = 90 };
+            vidBrush.SetSource(camera);
+            PreviewVideoBrush = vidBrush;
         }
 
-        private void releaseCamera()
+        private void toggleCamera()
+        {
+            if(curType == CameraType.Primary)
+            {
+                curType = CameraType.FrontFacing;
+                camera = new PhotoCamera(CameraType.FrontFacing);
+            }
+            else
+            {
+                curType = CameraType.Primary;
+                camera = new PhotoCamera(CameraType.Primary);
+            }
+
+            // Event is fired when the PhotoCamera object has been initialized.
+            camera.Initialized += new EventHandler<Microsoft.Devices.CameraOperationCompletedEventArgs>(camera_initialized);
+
+            // Event is fired when the capture sequence is complete and an image is available.
+            camera.CaptureImageAvailable += new EventHandler<Microsoft.Devices.ContentReadyEventArgs>(camera_captureImageAvailable);
+
+            // Event is fired when the capture sequence is complete and a thumbnail image is available.
+            camera.CaptureThumbnailAvailable += new EventHandler<ContentReadyEventArgs>(camera_captureThumbnailAvailable);
+
+            //Set the VideoBrush source to the camera.
+            PreviewVideoBrush = new VideoBrush();
+            VideoBrush vidBrush = (VideoBrush)PreviewVideoBrush;
+
+            if (camera.CameraType == CameraType.FrontFacing)
+                vidBrush.RelativeTransform = new CompositeTransform() { CenterX = .5, CenterY = .5, Rotation = -90 };
+            else
+                vidBrush.RelativeTransform = new CompositeTransform() { CenterX = .5, CenterY = .5, Rotation = 90 };
+            vidBrush.SetSource(camera);
+            PreviewVideoBrush = vidBrush;
+        }
+
+        public void releaseCamera()
         {
             if(camera != null)
             {
@@ -99,17 +206,41 @@ namespace Frame_for_WP.ViewModels
                 camera.Initialized -= camera_initialized;
                 camera.CaptureImageAvailable -= camera_captureImageAvailable;
                 camera.CaptureThumbnailAvailable -= camera_captureThumbnailAvailable;
+
             }
         }
 
         private void camera_captureImageAvailable(object sender, ContentReadyEventArgs e)
         {
-            //Now that we have 
+            try
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(delegate()
+                {
+                    ShutterVisibility = Visibility.Collapsed;
+                    SetUpAppBar();
+
+                    releaseCamera();
+
+                    PreviewVideoBrush = new ImageBrush();
+                    ImageBrush imgBrush = (ImageBrush)PreviewVideoBrush;
+
+                    BitmapImage img = new BitmapImage();
+                    img.SetSource(e.ImageStream);
+                    imgBrush.ImageSource = img;
+                    if (camera.CameraType == CameraType.FrontFacing)
+                        imgBrush.RelativeTransform = new CompositeTransform() { CenterX = .5, CenterY = .5, Rotation = -90 };
+                    else
+                        imgBrush.RelativeTransform = new CompositeTransform() { CenterX = .5, CenterY = .5, Rotation = 90 };
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
         }
 
         private void camera_captureThumbnailAvailable(object sender, ContentReadyEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         private void camera_initialized(object sender, CameraOperationCompletedEventArgs e)
@@ -118,13 +249,95 @@ namespace Frame_for_WP.ViewModels
             {
                 System.Diagnostics.Debug.WriteLine("Camera initialized");
             }
+
         }
 
-        private void SetUpAppBar(PivotItemEventArgs arg)
+        private void SetUpAppBar()
         {
             while (AppBar.Buttons.Count > 0)
             {
                 AppBar.Buttons.RemoveAt(0);
+            }
+
+            //Shutter visibility determines if we are in edit mode or not.
+            //If the shutter is visible, then this means we are in picture-taking mode and not edit mode.
+            if (ShutterVisibility == Visibility.Visible)
+            {
+                ApplicationBarIconButton gridButton = new ApplicationBarIconButton();
+                gridButton.IconUri = new Uri("/Assets/AppBar/refresh.png", UriKind.Relative);
+                gridButton.Text = "refresh";
+                AppBar.Buttons.Add(gridButton);
+                gridButton.Click += new EventHandler(toggleGrid);
+
+                ApplicationBarIconButton changeCam = new ApplicationBarIconButton();
+                changeCam.IconUri = new Uri("/Assets/AppBar/appbar.camera.switch.png", UriKind.Relative);
+                changeCam.Text = "change cam";
+                AppBar.Buttons.Add(changeCam);
+                changeCam.IsEnabled = PhotoCamera.IsCameraTypeSupported(CameraType.FrontFacing);
+                changeCam.Click += new EventHandler(toggleCamera);
+
+                ApplicationBarIconButton flashButton = new ApplicationBarIconButton();
+                flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.auto.png", UriKind.Relative);
+                flashButton.Text = "auto flash";
+                AppBar.Buttons.Add(flashButton);
+                flashButton.Click += new EventHandler(toggleFlash);
+            }
+            else
+            {
+                ApplicationBarIconButton tagsButton = new ApplicationBarIconButton();
+                tagsButton.IconUri = new Uri("/Assets/AppBar/appbar.tag.png", UriKind.Relative);
+                tagsButton.Text = "add tags";
+                AppBar.Buttons.Add(tagsButton);
+                tagsButton.Click += new EventHandler(addTags);
+
+                ApplicationBarIconButton postButton = new ApplicationBarIconButton();
+                postButton.IconUri = new Uri("/Assets/AppBar/appbar.arrow.right.png", UriKind.Relative);
+                postButton.Text = "post";
+                AppBar.Buttons.Add(postButton);
+                postButton.Click += new EventHandler(postPicture);
+            }
+        }
+
+        private void addTags(object sender, EventArgs e)
+        {
+        }
+
+        private void postPicture(object sender, EventArgs e)
+        {
+        }
+
+        private void toggleGrid(object sender, EventArgs e)
+        {
+        }
+
+        private void toggleCamera(object sender, EventArgs e)
+        {
+            releaseCamera();
+            toggleCamera();
+        }
+
+        private void toggleFlash(object sender, EventArgs e)
+        {
+            ApplicationBarIconButton flashButton = sender as ApplicationBarIconButton;
+
+            flashMode = (flashMode + 1) % 3;
+            switch(flashMode)
+            {
+                case 0:
+                    flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.auto.png", UriKind.Relative);
+                    flashButton.Text = "auto flash";
+                    camera.FlashMode = FlashMode.Auto;
+                    break;
+                case 1:
+                    flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.off.png", UriKind.Relative);
+                    flashButton.Text = "flash off";
+                    camera.FlashMode = FlashMode.Off;
+                    break;
+                case 2:
+                    flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.png", UriKind.Relative);
+                    flashButton.Text = "flash";
+                    camera.FlashMode = FlashMode.On;
+                    break;
             }
         }
     }
