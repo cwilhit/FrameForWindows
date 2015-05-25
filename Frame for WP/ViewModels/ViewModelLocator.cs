@@ -56,6 +56,8 @@ namespace Frame_for_WP.ViewModel
         {
             var navService = new NavigationService();
             navService.Configure("MediaContentPostPage", new Uri("/View/MediaContentPostPage.xaml", UriKind.Relative));
+            navService.Configure("MediaFeedPage", new Uri("/View/MainPage.xaml", UriKind.Relative));
+
 
             return navService;
         }

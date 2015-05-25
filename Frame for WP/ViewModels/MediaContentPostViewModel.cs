@@ -1,6 +1,7 @@
 ﻿using Frame_for_WP.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Views;
 using Microsoft.Devices;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
@@ -13,6 +14,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -23,6 +26,7 @@ namespace Frame_for_WP.ViewModels
         private int flashMode = 0;
         PhotoCamera camera;
         CameraType curType;
+        private string tags = "";
 
         private Visibility shutterVisiblity;
         public Visibility ShutterVisibility
@@ -31,6 +35,17 @@ namespace Frame_for_WP.ViewModels
             set
             {
                 shutterVisiblity = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private Visibility bracketVisibility;
+        public Visibility BracketVisibility
+        {
+            get { return bracketVisibility; }
+            set
+            {
+                bracketVisibility = value;
                 RaisePropertyChanged();
             }
         }
@@ -76,20 +91,25 @@ namespace Frame_for_WP.ViewModels
             }
         }
 
-        public MediaContentPostViewModel()
+        private readonly NavigationService navigationService;
+
+        public MediaContentPostViewModel(INavigationService navigationService)
         {
+            this.navigationService = (NavigationService)navigationService;
             ShutterCommand = new RelayCommand(() => ShutterButtonClick());
             BackKeyPressCommand = new RelayCommand<CancelEventArgs>((x) => InterceptBackKeyPress(x));
 
             SetUpAppBar();
             AppBar.Opacity = .65;
             ShutterVisibility = Visibility.Visible;
+            BracketVisibility = Visibility.Collapsed;
         }
 
         private void InterceptBackKeyPress(CancelEventArgs x)
         {
             if (ShutterVisibility == Visibility.Collapsed)
             {
+                //Toggle over to picture-taking mode. Show the shutter button and re-set up the appbar, open camera.
                 x.Cancel = true;
                 ShutterVisibility = Visibility.Visible;
                 SetUpAppBar();
@@ -98,13 +118,13 @@ namespace Frame_for_WP.ViewModels
             }
             else
             {
+                //We are currently in picture-edit mode, so the user wants to return to the media feed. Release resources.
                 releaseCamera();
             }
         }
 
         private void ShutterButtonClick()
         {
-
             if(camera != null)
             {
                 try
@@ -206,7 +226,6 @@ namespace Frame_for_WP.ViewModels
                 camera.Initialized -= camera_initialized;
                 camera.CaptureImageAvailable -= camera_captureImageAvailable;
                 camera.CaptureThumbnailAvailable -= camera_captureThumbnailAvailable;
-
             }
         }
 
@@ -300,14 +319,72 @@ namespace Frame_for_WP.ViewModels
 
         private void addTags(object sender, EventArgs e)
         {
+            StackPanel panel = new StackPanel();
+            TextBlock label = new TextBlock();
+            label.Text = "Insert tags separated by a ',' to allow for users to search for content with similar tags.";
+            label.Margin = new Thickness(10, 10, 10, 10);
+            label.TextWrapping = TextWrapping.Wrap;
+            TextBox input = new TextBox();
+            InputScope inputScope = new InputScope();
+            InputScopeName inputScopeName = new InputScopeName();
+            inputScopeName.NameValue = InputScopeNameValue.AlphanumericFullWidth;
+            inputScope.Names.Add(inputScopeName);
+            input.InputScope = inputScope;
+            panel.Children.Add(label);
+            panel.Children.Add(input);
+
+            CustomMessageBox messageBox = new CustomMessageBox()
+            {
+                Title = "Add tags",
+                Content = panel,
+                LeftButtonContent = "ok",
+                RightButtonContent = "cancel",
+            };
+
+            messageBox.Dismissing += (s1, e1) =>
+            {
+            };
+
+            messageBox.Dismissed += (s2, e2) =>
+            {
+                switch (e2.Result)
+                {
+                    case CustomMessageBoxResult.LeftButton:
+                        {
+                            tags = input.Text;
+                            break;
+                        }
+
+                    case CustomMessageBoxResult.RightButton:
+                    case CustomMessageBoxResult.None:
+                        // Do nothing
+                        break;
+                    default:
+                        break;
+                }
+            };
+
+            messageBox.Show();
         }
 
         private void postPicture(object sender, EventArgs e)
         {
+            //Send picture to the server.
+            navigationService.GoBack();
+            ShutterVisibility = Visibility.Visible;
+            SetUpAppBar();
         }
 
         private void toggleGrid(object sender, EventArgs e)
         {
+            try
+            {
+
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
 
         private void toggleCamera(object sender, EventArgs e)
@@ -318,26 +395,34 @@ namespace Frame_for_WP.ViewModels
 
         private void toggleFlash(object sender, EventArgs e)
         {
-            ApplicationBarIconButton flashButton = sender as ApplicationBarIconButton;
-
-            flashMode = (flashMode + 1) % 3;
-            switch(flashMode)
+            try
             {
-                case 0:
-                    flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.auto.png", UriKind.Relative);
-                    flashButton.Text = "auto flash";
-                    camera.FlashMode = FlashMode.Auto;
-                    break;
-                case 1:
-                    flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.off.png", UriKind.Relative);
-                    flashButton.Text = "flash off";
-                    camera.FlashMode = FlashMode.Off;
-                    break;
-                case 2:
-                    flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.png", UriKind.Relative);
-                    flashButton.Text = "flash";
-                    camera.FlashMode = FlashMode.On;
-                    break;
+                ApplicationBarIconButton flashButton = sender as ApplicationBarIconButton;
+
+                flashMode = (flashMode + 1) % 3;
+                switch (flashMode)
+                {
+                    case 0:
+                        flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.auto.png", UriKind.Relative);
+                        flashButton.Text = "auto flash";
+                        camera.FlashMode = FlashMode.Auto;
+                        break;
+                    case 1:
+                        flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.off.png", UriKind.Relative);
+                        flashButton.Text = "flash off";
+                        camera.FlashMode = FlashMode.Off;
+                        break;
+                    case 2:
+                        flashButton.IconUri = new Uri("/Assets/AppBar/appbar.camera.flash.png", UriKind.Relative);
+                        flashButton.Text = "flash";
+                        camera.FlashMode = FlashMode.On;
+                        break;
+                }
+            }
+            catch(Exception ex)
+            {
+                //Suppress exception. The only time we get exceptions are if the user clicks the button while
+                //the camera is being set up.
             }
         }
     }
