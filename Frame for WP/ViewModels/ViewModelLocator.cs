@@ -50,14 +50,17 @@ namespace Frame_for_WP.ViewModel
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<MediaFeedViewModel>();
             SimpleIoc.Default.Register<MediaContentPostViewModel>();
+            SimpleIoc.Default.Register<TextToPictureViewModel>();
         }
 
         private INavigationService CreateNavigationService()
         {
             var navService = new NavigationService();
+
+            navService.Configure("TextToPicturePage", new Uri("/View/TextToPicturePage.xaml", UriKind.Relative));
+            navService.Configure("PreviewConversionPage", new Uri("/View/PreviewConversionPage.xaml", UriKind.Relative));
             navService.Configure("MediaContentPostPage", new Uri("/View/MediaContentPostPage.xaml", UriKind.Relative));
             navService.Configure("MediaFeedPage", new Uri("/View/MainPage.xaml", UriKind.Relative));
-
 
             return navService;
         }
@@ -83,6 +86,14 @@ namespace Frame_for_WP.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<MediaContentPostViewModel>();
+            }
+        }
+
+        public TextToPictureViewModel TextToPictureVM
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<TextToPictureViewModel>();
             }
         }
         

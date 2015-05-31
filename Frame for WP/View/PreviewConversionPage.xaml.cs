@@ -10,9 +10,9 @@ using Microsoft.Phone.Shell;
 
 namespace Frame_for_WP.View
 {
-    public partial class PostPage : PhoneApplicationPage
+    public partial class PreviewConversionPage : PhoneApplicationPage
     {
-        public PostPage()
+        public PreviewConversionPage()
         {
             InitializeComponent();
         }

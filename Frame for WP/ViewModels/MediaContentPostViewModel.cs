@@ -282,12 +282,6 @@ namespace Frame_for_WP.ViewModels
             //If the shutter is visible, then this means we are in picture-taking mode and not edit mode.
             if (ShutterVisibility == Visibility.Visible)
             {
-                ApplicationBarIconButton gridButton = new ApplicationBarIconButton();
-                gridButton.IconUri = new Uri("/Assets/AppBar/refresh.png", UriKind.Relative);
-                gridButton.Text = "refresh";
-                AppBar.Buttons.Add(gridButton);
-                gridButton.Click += new EventHandler(toggleGrid);
-
                 ApplicationBarIconButton changeCam = new ApplicationBarIconButton();
                 changeCam.IconUri = new Uri("/Assets/AppBar/appbar.camera.switch.png", UriKind.Relative);
                 changeCam.Text = "change cam";
@@ -373,18 +367,6 @@ namespace Frame_for_WP.ViewModels
             navigationService.GoBack();
             ShutterVisibility = Visibility.Visible;
             SetUpAppBar();
-        }
-
-        private void toggleGrid(object sender, EventArgs e)
-        {
-            try
-            {
-
-            }
-            catch(Exception ex)
-            {
-
-            }
         }
 
         private void toggleCamera(object sender, EventArgs e)

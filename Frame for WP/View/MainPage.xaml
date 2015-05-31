@@ -84,7 +84,7 @@
             <phone:PivotItem Header="post">
                 <StackPanel>
                     <Button Content="Picture" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding OpenCameraCommand}" Height="138" Margin="96,0,127,0" Width="233"/>
-                    <Button Content="Text" HorizontalAlignment="Center" VerticalAlignment="Top" Height="171" Margin="111,0,127,0" Width="218"/>
+                    <Button Content="Text" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding TextToPicCommand}" Height="171" Margin="111,0,127,0" Width="218"/>
                 </StackPanel>
             </phone:PivotItem>
         </phone:Pivot>

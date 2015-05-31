@@ -32,6 +32,12 @@ namespace Frame_for_WP.ViewModels
             private set;
         }
 
+        public RelayCommand TextToPicCommand
+        {
+            get;
+            private set;
+        }
+
         private ObservableCollection<MediaContent> contentFeed;
         public ObservableCollection<MediaContent> ContentFeed
         {
@@ -68,11 +74,17 @@ namespace Frame_for_WP.ViewModels
 
             LoadPivotItemAppBar = new RelayCommand<PivotItemEventArgs>((s) => SetUpAppBar(s));
             OpenCameraCommand = new RelayCommand(() => onOpenCamera());
+            TextToPicCommand = new RelayCommand(() => ToTextToPic());
         }
 
         private void onOpenCamera()
         {
             navigationService.NavigateTo("MediaContentPostPage");
+        }
+
+        private void ToTextToPic()
+        {
+            navigationService.NavigateTo("TextToPicturePage");
         }
 
         private void mediaFeedAppBarSetup()

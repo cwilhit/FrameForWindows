@@ -100,7 +100,9 @@
     <Compile Include="Model\JSONMessage.cs" />
     <Compile Include="Model\JSONPicture.cs" />
     <Compile Include="Model\MediaContent.cs" />
+    <Compile Include="Model\SimpleFontItem.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\TextToPictureViewModel.cs" />
     <Compile Include="ViewModels\MediaContentPostViewModel.cs" />
     <Compile Include="ViewModels\MediaFeedViewModel.cs" />
     <Compile Include="ViewModels\PostViewModel.cs" />
@@ -120,8 +122,11 @@
     <Compile Include="View\MediaContentPostPage.xaml.cs">
       <DependentUpon>MediaContentPostPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\PostPage.xaml.cs">
-      <DependentUpon>PostPage.xaml</DependentUpon>
+    <Compile Include="View\PreviewConversionPage.xaml.cs">
+      <DependentUpon>PreviewConversionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\TextToPicturePage.xaml.cs">
+      <DependentUpon>TextToPicturePage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -141,7 +146,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\PostPage.xaml">
+    <Page Include="View\PreviewConversionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\TextToPicturePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
