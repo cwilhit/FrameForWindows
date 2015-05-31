@@ -1,4 +1,5 @@
-﻿using Frame_for_WP.Model;
+﻿using Coding4Fun.Toolkit.Controls;
+using Frame_for_WP.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Views;
@@ -92,6 +93,7 @@ namespace Frame_for_WP.ViewModels
         }
 
         private readonly NavigationService navigationService;
+        private bool showingMessageBox = false;
 
         public MediaContentPostViewModel(INavigationService navigationService)
         {
@@ -107,6 +109,12 @@ namespace Frame_for_WP.ViewModels
 
         private void InterceptBackKeyPress(CancelEventArgs x)
         {
+            if(showingMessageBox)
+            {
+                x.Cancel = true;
+                return;
+            }
+
             if (ShutterVisibility == Visibility.Collapsed)
             {
                 //Toggle over to picture-taking mode. Show the shutter button and re-set up the appbar, open camera.
@@ -327,6 +335,8 @@ namespace Frame_for_WP.ViewModels
             panel.Children.Add(label);
             panel.Children.Add(input);
 
+            showingMessageBox = true;
+
             CustomMessageBox messageBox = new CustomMessageBox()
             {
                 Title = "Add tags",
@@ -341,6 +351,7 @@ namespace Frame_for_WP.ViewModels
 
             messageBox.Dismissed += (s2, e2) =>
             {
+                showingMessageBox = false;
                 switch (e2.Result)
                 {
                     case CustomMessageBoxResult.LeftButton:

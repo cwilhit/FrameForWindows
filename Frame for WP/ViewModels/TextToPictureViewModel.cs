@@ -90,7 +90,6 @@ namespace Frame_for_WP.ViewModels
             }
         }
 
-        private WriteableBitmap preview;
         private BitmapImage prev;
         public BitmapImage Preview
         {
@@ -131,6 +130,7 @@ namespace Frame_for_WP.ViewModels
         }
 
         private bool isPreviewing = false;
+        private bool showingMessageBox = false;
 
         private readonly NavigationService navigationService;
 
@@ -211,6 +211,8 @@ namespace Frame_for_WP.ViewModels
             panel.Children.Add(label);
             panel.Children.Add(input);
 
+            showingMessageBox = true;
+
             CustomMessageBox messageBox = new CustomMessageBox()
             {
                 Title = "Add tags",
@@ -225,6 +227,7 @@ namespace Frame_for_WP.ViewModels
 
             messageBox.Dismissed += (s2, e2) =>
             {
+                showingMessageBox = false;
                 switch (e2.Result)
                 {
                     case CustomMessageBoxResult.LeftButton:
@@ -299,6 +302,8 @@ namespace Frame_for_WP.ViewModels
             picker.Color = b.Color;
             panel.Children.Add(picker);
 
+            showingMessageBox = true;
+
             CustomMessageBox messageBox = new CustomMessageBox()
             {
                 Title = "Text Color",
@@ -313,6 +318,7 @@ namespace Frame_for_WP.ViewModels
 
             messageBox.Dismissed += (s2, e2) =>
             {
+                showingMessageBox = false;
                 switch (e2.Result)
                 {
                     case CustomMessageBoxResult.LeftButton:
@@ -343,7 +349,7 @@ namespace Frame_for_WP.ViewModels
 
         private void makePreview()
         {
-            preview = new WriteableBitmap(600, 600);
+            WriteableBitmap preview = new WriteableBitmap(600, 600);
             TextBlock temp = new TextBlock();
             temp.Text = toConvert;
             temp.FontFamily = desiredFont.Font;
@@ -352,17 +358,26 @@ namespace Frame_for_WP.ViewModels
             background.Background = backgroundColor;
             preview.Render(background, null); //render the background color
             preview.Render(temp, null); //Render the text over that
-            
+            preview.Invalidate();
+
+
             using(MemoryStream ms = new MemoryStream())
             {
                 preview.SaveJpeg(ms, 600, 600, 0, 100);
                 Preview = new BitmapImage();
                 Preview.SetSource(ms);
+                
             }
         }
 
         private void InterceptBackKey(CancelEventArgs x)
         {
+            if(showingMessageBox)
+            {
+                x.Cancel = true;
+                return;
+            }
+
             if (isPreviewing)
             {
                 isPreviewing = false;
