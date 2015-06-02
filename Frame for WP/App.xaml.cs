@@ -8,6 +8,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Frame_for_WP.Resources;
 using Frame_for_WP.ViewModel;
+using Microsoft.WindowsAzure.MobileServices;
 
 namespace Frame_for_WP
 {
@@ -18,6 +19,13 @@ namespace Frame_for_WP
         /// </summary>
         /// <returns>The root frame of the Phone Application.</returns>
         public static PhoneApplicationFrame RootFrame { get; private set; }
+
+        public static MobileServiceClient MobileService = new MobileServiceClient("http://localhost:59987");
+        // Use this constructor instead after publishing to the cloud
+        // public static MobileServiceClient MobileService = new MobileServiceClient(
+        //      "https://frame.azure-mobile.net/",
+        //      "lXkroXlkqXAUELwVTksuEEqRxFOZZC52"
+        //);
 
         /// <summary>
         /// Constructor for the Application object.
